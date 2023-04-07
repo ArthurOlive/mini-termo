@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letroca</title>
+
+    <link rel="stylesheet" href="./style.css"/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+</head>
+<body class="font-poppins">
+
+    <div id="modal" class="fixed z-10 bg-black/50 w-full h-full" onclick="closeModal(event)">
+        <div class="z-20 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/4 bg-gray-800 p-10 rounded-lg shadow-lg font-poppins text-lg ">
+            <p class="">Descubra a palavra certa em 6 tentativas. Depois de cada tentativa, as peças mostram o quão perto você está da solução.</p> 
+
+            <div class="flex gap-2 my-5">
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-green-700">T</span>
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-slate-700">U</span>
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-slate-700">R</span>
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-slate-700">M</span>
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-slate-700">A</span>
+            </div>
+
+            <br/>
+            </p class="my-3">
+                A letra <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-green-700">T</span>
+                faz parte da palavra e está na posição correta. 
+            </p>
+            <br/>
+
+            <div class="flex gap-2 my-5">
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-slate-700">V</span>
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-slate-700">I</span>
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-yellow-500">O</span>
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-slate-700">L</span>
+                <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-slate-700">A</span>
+            </div>
+            <br/>
+            </p class="my-3">A letra <span class="text-xl p-2 rounded w-12 h-12 text-center border-2 border-slate-600 bg-yellow-500">O</span> faz parte da palavra mas em outra posição.</p>
+            <br/>
+            </p class="my-3">As palavras podem possuir letras repetidas.</p>
+        </div>
+    </div>
+
+    <div class="h-screen w-screen bg-gray-900 flex flex-col justify-center items-center p-3">
+
+        <div class="text-white absolute top-16 left-1/2 -translate-x-1/2 font-bold text-2xl flex justify-between items-end gap-11">
+            <i class="fa-solid fa-square-ellipsis"></i>
+
+            <span class="w-full text-4xl">MINITERMO</span>
+            
+            <i class="fa-solid fa-rotate-right" onclick="reset()"></i>
+            
+        </div>
+        
+        <div class="absolute top-28 left-1/2 -translate-x-1/2 text-white font-bold">
+            <span id="words">
+                
+            </span>
+        </div>
+        
+        <div class="flex flex-col gap-3 justify-center items-center" id="board">
+
+            <div class="disabled:bg-yellow-500"></div>
+        
+            <!-- TODO -->    
+
+            <div class="focus:border-b-[10px]"></div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        let wordsArray = [  "ACIMA",  "BATER",  "CAMPO",  "DARDO",  "ELITE",  "FICAR",  "GRUPO",  "JANTA",  "CAIXA",  "JOGOS",  "AMARO",  "LIMPO",  "MANHA",  
+        "NOTAS",  "PORTA",  "PESAR",  "QUEDA",  "RAZAO",  "SABER",  "TALAO",  "UNIAO",  "VALOR",  "ROCHA",  "SELVA",  "TUNEL",  "TORRE",  "ULTRA",  "URSOS",  
+        "VIAJA",  "CHORA",  "AEREO",  "XAMPU",  "RUINA",  "TESTA",  "ZEBRA",  "ZUMBI",  "ALGUM",  "ARENA",  "ARVOR",  "APICE",  "BOLOS",  "BELOS",  "CANOA",  
+        "CHAMA",  "COLHE",  "DIZER",  "ESTAR",  "TRETA",  "FICHA",  "FUGAZ",  "GROSA",  "GRUPO",  "CHUTE",  "HOTEL",  "HAVER",  "UIVAR",  "POLPA",  "JUROS",  
+        "JANTO",  "KARMA",  "POLPA",  "LIMBO",  "LIVRO",  "LIMPO",  "LUTAR",  "MATAR",  "MUNDO",  "MONTI",  "NIVEL",  "NOITE",  "POUSA",  "JUNHO",  "PILAR",  
+        "QUASE",  "ROSAS",  "RISCO",  "SULCO",  "SAMBA",  "TORNO",  "ULTRA",  "URINA",  "VIRAR",  "VIOLA",  "FRACO",  "VISTA", "MANSO",  "CHUTE",  "JULHO",  
+        "FUGIR",  "JUSTO"]
+
+
+        let selectWord = wordsArray[Math.floor(Math.random() * wordsArray.length )]
+
+        let line = 0
+        let chances = 6
+
+        construct()
+
+        function construct() {
+
+            let board = document.getElementById("board")
+            
+            for (let i = 0; i < chances; i++) {
+                board.innerHTML += `
+                    <div class="grid grid-cols-5 gap-4 relative">
+                        <input onkeydown="inputEvent(event)" id='${i}-0' class="bg-slate-800 w-20 h-20 rounded focus:border-b-[10px] outline-none text-white text-4xl uppercase text-center px-5 py-6 border-slate-600 border-4 disabled:bg-slate-700 disabled:border-none" ${i == 0 ? '' : 'disabled'}/>
+                        <input onkeydown="inputEvent(event)" id='${i}-1' class="bg-slate-800 w-20 h-20 rounded focus:border-b-[10px] outline-none text-white text-4xl uppercase text-center px-5 py-6 border-slate-600 border-4 disabled:bg-slate-700 disabled:border-none" ${i == 0 ? '' : 'disabled'}/>
+                        <input onkeydown="inputEvent(event)" id='${i}-2' class="bg-slate-800 w-20 h-20 rounded focus:border-b-[10px] outline-none text-white text-4xl uppercase text-center px-5 py-6 border-slate-600 border-4 disabled:bg-slate-700 disabled:border-none" ${i == 0 ? '' : 'disabled'}/>
+                        <input onkeydown="inputEvent(event)" id='${i}-3' class="bg-slate-800 w-20 h-20 rounded focus:border-b-[10px] outline-none text-white text-4xl uppercase text-center px-5 py-6 border-slate-600 border-4 disabled:bg-slate-700 disabled:border-none" ${i == 0 ? '' : 'disabled'}/>
+                        <input onkeydown="inputEvent(event)" id='${i}-4' class="bg-slate-800 w-20 h-20 rounded focus:border-b-[10px] outline-none text-white text-4xl uppercase text-center px-5 py-6 border-slate-600 border-4 disabled:bg-slate-700 disabled:border-none" ${i == 0 ? '' : 'disabled'}/>
+                    </div>
+                `
+            }
+
+        }
+
+        function closeModal(event) {
+            document.getElementById("modal").style.display = "none"
+        }
+
+        function reset() {
+            selectWord = wordsArray[Math.floor(Math.random() * wordsArray.length )]
+            line = 0
+            board.innerHTML = ""
+            document.getElementById("words").innerHTML = ``
+            construct()
+        }
+
+        function validate() {
+            let l1 = document.getElementById(`${line}-0`)
+            let l2 = document.getElementById(`${line}-1`)
+            let l3 = document.getElementById(`${line}-2`)
+            let l4 = document.getElementById(`${line}-3`)
+            let l5 = document.getElementById(`${line}-4`)
+
+            
+            let [w1, w2, w3, w4, w5] = selectWord
+
+            const v1 = l1.value.toUpperCase()
+            const v2 = l2.value.toUpperCase()
+            const v3 = l3.value.toUpperCase()
+            const v4 = l4.value.toUpperCase()
+            const v5 = l5.value.toUpperCase()
+
+            if (v1 == w1 && v2 == w2 && v3 == w3 && v4 == w4 && v5 == w5 ) {
+                console.log("FIM DE JOGO")
+
+                document.getElementById("words").innerHTML = `FIM DE JOGO\nPalavras: "${selectWord}"`
+                
+                l1.classList.remove("disabled:bg-slate-700")
+                l2.classList.remove("disabled:bg-slate-700")
+                l3.classList.remove("disabled:bg-slate-700")
+                l4.classList.remove("disabled:bg-slate-700")
+                l5.classList.remove("disabled:bg-slate-700")
+                
+                l1.className += " disabled:bg-green-700"
+                l2.className += " disabled:bg-green-700"
+                l3.className += " disabled:bg-green-700"
+                l4.className += " disabled:bg-green-700"
+                l5.className += " disabled:bg-green-700"
+
+                l1.disabled = "true"
+                l2.disabled = "true"
+                l3.disabled = "true"
+                l4.disabled = "true"
+                l5.disabled = "true"
+
+                return;
+            }
+
+            if (v1 == w1) {
+                l1.classList.remove("disabled:bg-slate-700")
+                l1.className += " disabled:bg-green-700"
+            } else if (v1 == w1 || v1 == w2 || v1 == w3 || v1 == w4 || v1 == w5) {
+                l1.classList.remove("disabled:bg-slate-700")
+                l1.className += " disabled:bg-yellow-500"
+            }
+
+            if (v2 == w2) {
+                l2.classList.remove("disabled:bg-slate-700")
+                l2.className += " disabled:bg-green-700"
+            } else if (v2 == w1 || v2 == w2 || v2 == w3 || v2 == w4 || v2 == w5) {
+                l2.classList.remove("disabled:bg-slate-700")
+                l2.className += " disabled:bg-yellow-500"
+            }
+            
+            if (v3 == w3) {
+                l3.classList.remove("disabled:bg-slate-700")
+                l3.className += " disabled:bg-green-700"
+            } else if (v3 == w1 || v3 == w2 || v3 == w3 || v3 == w4 || v3 == w5) {
+                l3.classList.remove("disabled:bg-slate-700")
+                l3.className += " disabled:bg-yellow-500"
+            }
+
+            if (v4 == w4) {
+                l4.classList.remove("disabled:bg-slate-700")
+                l4.className += " disabled:bg-green-700"
+            } else if (v4 == w1 || v4 == w2 || v4 == w3 || v4 == w4 || v4 == w5) {
+                l4.classList.remove("disabled:bg-slate-700")
+                l4.className += " disabled:bg-yellow-500"
+            }
+
+            if (v5 == w5) {
+                l5.classList.remove("disabled:bg-slate-700")
+                l5.className += " disabled:bg-green-700"
+            } else if (v5 == w1 || v5 == w2 || v5 == w3 || v5 == w4 || v5 == w5) {
+                l5.classList.remove("disabled:bg-slate-700")
+                l5.className += " disabled:bg-yellow-500"
+            }
+
+            nextLine()
+        }
+
+        function nextLine() {
+            document.getElementById(`${line}-0`).disabled = true
+            document.getElementById(`${line}-1`).disabled = true
+            document.getElementById(`${line}-2`).disabled = true
+            document.getElementById(`${line}-3`).disabled = true
+            document.getElementById(`${line}-4`).disabled = true
+
+            line ++
+
+            if (line == chances) { 
+                document.getElementById("words").innerHTML = `Palavras: "${selectWord}"`
+                return;
+            }
+
+            document.getElementById(`${line}-0`).disabled = false
+            document.getElementById(`${line}-1`).disabled = false
+            document.getElementById(`${line}-2`).disabled = false
+            document.getElementById(`${line}-3`).disabled = false
+            document.getElementById(`${line}-4`).disabled = false
+        }
+
+        function checkAnyEmpty() {
+            let l1 = document.getElementById(`${line}-0`).value
+            let l2 = document.getElementById(`${line}-1`).value
+            let l3 = document.getElementById(`${line}-2`).value
+            let l4 = document.getElementById(`${line}-3`).value
+            let l5 = document.getElementById(`${line}-4`).value
+
+            if (l1 && l2 && l3 && l4 && l5) return true
+
+            return false
+        }
+
+        function prevFocus(id) {
+            const prev = id[0] + "-" + (id[2] == '0' ? 0 : parseInt(id[2]) - 1)
+            document.getElementById(prev).focus()
+        }
+
+        function nextFocus(id) {
+            const next = id[0] + "-" + (id[2] == '4' ? 4 : parseInt(id[2]) + 1)
+            document.getElementById(next).focus()
+        }
+
+
+        function inputEvent(e) {
+            e.preventDefault()
+
+            if (e.keyCode >= 65 && e.keyCode <= 90) {
+                e.target.value = "" + e.key
+
+                nextFocus(e.target.id)
+            }
+
+            if (e.keyCode == 8) {
+
+                if (e.target.value == "") {
+                    prevFocus(e.target.id)
+                }
+
+                e.target.value = ""
+            }
+
+            if(e.keyCode == 13) {
+                if (checkAnyEmpty()) validate()
+            }
+        } 
+
+    </script>
+    
+</body>
+</html>
